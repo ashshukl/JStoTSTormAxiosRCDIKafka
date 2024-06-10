@@ -18,7 +18,8 @@ import { Customer } from "../models/Customer";
 import { plainToClass, serialize } from "class-transformer";
 import { CustomersService } from "../services/CustomersService";
 import { Inject, Service } from "typedi";
-import { enbdProducer } from "../connectors/kafka";
+import { enbdProducer, CreateKafkaMessage } from "../connectors/kafka";
+import { ProducerRecord, TopicMessages } from "kafkajs";
 
 @Controller("/customers")
 @UseBefore(CustomerBeforeMiddleware)
@@ -35,56 +36,67 @@ export class CustomersController {
 
   @Get("/:id")
   async get(@Param("id") id: number) {
-    await this.enbdProducer.sendMessage("log", this.logMsg + "getById");
     await this.enbdProducer.sendMessage(
-      "notify",
-      '{message: "Customer Searched by Id"}'
+      CreateKafkaMessage("log", [this.logMsg + "getById"])
+    );
+    await this.enbdProducer.sendMessage(
+      CreateKafkaMessage("notify", [
+        "Customer Searched by Id",
+      ]) as ProducerRecord
     );
     return this.customersSvc?.get(id);
   }
 
   @Put("/:id")
   async update(@Param("id") id: number, @Body() customerJSON: any) {
+    let batch: TopicMessages[] = [];
+
     let customer: Customer = plainToClass(Customer, customerJSON);
-    await this.enbdProducer.sendMessage("log", this.logMsg + "update");
-    await this.enbdProducer.sendMessage("log", JSON.stringify(customer));
-    await this.enbdProducer.sendMessage(
-      "notify",
-      '{message: "Customer Modified"}'
+
+    batch.push(
+      CreateKafkaMessage("log", [
+        this.logMsg + "update",
+        JSON.stringify(customerJSON),
+      ])
     );
+    batch.push(CreateKafkaMessage("notify", ["Customer Modified"]));
+
+    await this.enbdProducer.sendMessageBatch(batch);
     return this.customersSvc?.update(id, customer);
   }
 
   @Delete("/:id")
   @UseBefore(CustomerDeleteMiddleware)
   async deleteCustomer(@Param("id") id: number) {
-    await this.enbdProducer.sendMessage("log", this.logMsg + "delete" + id);
-    await this.enbdProducer.sendMessage(
-      "notify",
-      '{message: "Customer Deleeted"}'
-    );
+    let msgBatch: TopicMessages[] = [
+      CreateKafkaMessage("log", [this.logMsg + "delete" + id]),
+      CreateKafkaMessage("notify", ["Customer Deleted"]),
+    ];
+    await this.enbdProducer.sendMessageBatch(msgBatch);
     return this.customersSvc?.deleteCustomer(id);
   }
 
   @Get()
   async getAll() {
-    await this.enbdProducer.sendMessage("log", this.logMsg + "getALL");
-    await this.enbdProducer.sendMessage(
-      "notify",
-      '{message: "Customer GetAll"}'
-    );
+    let msgBatch: TopicMessages[] = [
+      CreateKafkaMessage("log", [this.logMsg + "getALL"]),
+      CreateKafkaMessage("notify", ["Customer GetAll"]),
+    ];
+    await this.enbdProducer.sendXactionMessageBatch(msgBatch);
     return this.customersSvc?.getAll();
   }
 
   @Post()
   async create(@Body() customerJSON: any) {
     let customer: Customer = plainToClass(Customer, customerJSON);
-    await this.enbdProducer.sendMessage("log", this.logMsg + "create");
-    await this.enbdProducer.sendMessage("log", JSON.stringify(customer));
-    await this.enbdProducer.sendMessage(
-      "notify",
-      '{message: "Customer Created"}'
-    );
+    let msgBatch: TopicMessages[] = [
+      CreateKafkaMessage("log", [
+        this.logMsg + "create",
+        JSON.stringify(customer),
+      ]),
+      CreateKafkaMessage("notify", ["Customer Created"]),
+    ];
+    await this.enbdProducer.sendMessageBatch(msgBatch);
     return this.customersSvc?.create(customer);
   }
 }

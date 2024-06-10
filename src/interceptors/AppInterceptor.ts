@@ -1,6 +1,6 @@
 import { Interceptor, InterceptorInterface, Action } from "routing-controllers";
 import { Inject, Service } from "typedi";
-import { enbdProducer } from "../connectors/kafka";
+import { CreateKafkaMessage, enbdProducer } from "../connectors/kafka";
 
 @Service()
 @Interceptor()
@@ -11,7 +11,7 @@ export class AppInterceptor implements InterceptorInterface {
   enbdProducer!: enbdProducer;
 
   intercept(action: Action, result: any) {
-    this.enbdProducer.sendMessage("log", this.msgStr);
+    this.enbdProducer.sendMessage(CreateKafkaMessage("log", [this.msgStr]));
     return result;
   }
 }

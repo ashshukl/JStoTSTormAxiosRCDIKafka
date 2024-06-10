@@ -17,7 +17,7 @@ import { Product } from "../models/Product";
 import { plainToClass } from "class-transformer";
 import { ProductsService } from "../services/ProductsService";
 import Container, { Inject, Service } from "typedi";
-import { enbdProducer } from "../connectors/kafka";
+import { enbdProducer, CreateKafkaMessage } from "../connectors/kafka";
 
 @Controller("/products")
 @UseBefore(ProductsBeforeMiddleware)
@@ -36,19 +36,25 @@ export class ProductsController {
 
   @Get("/:id")
   getById(@Param("id") id: number) {
-    this.enbdProducer.sendMessage("log", this.msgStr + "getById");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgStr + "getById"])
+    );
     return this.productSvc?.getById(id);
   }
 
   @Delete("/:id")
   deleteProduct(@Param("id") id: number) {
-    this.enbdProducer.sendMessage("log", this.msgStr + "deleteProduct");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgStr + "deleteProduct"])
+    );
     return this.productSvc?.deleteProduct(id);
   }
 
   @Get()
   getAll() {
-    this.enbdProducer.sendMessage("log", this.msgStr + "getAll");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgStr + "getAll"])
+    );
     return this.productSvc?.getAll();
   }
 
@@ -56,7 +62,9 @@ export class ProductsController {
   @UseBefore(ProductsBeforeCreateMiddleware)
   create(@Body() productJSON: any) {
     let product: Product = plainToClass(Product, productJSON);
-    this.enbdProducer.sendMessage("log", this.msgStr + "create");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgStr + "create"])
+    );
     return this.productSvc?.create(product);
   }
 }

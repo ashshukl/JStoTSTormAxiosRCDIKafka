@@ -4,7 +4,7 @@ import {
   ExpressMiddlewareInterface,
   ExpressErrorMiddlewareInterface,
 } from "routing-controllers";
-import { enbdProducer } from "../connectors/kafka";
+import { enbdProducer, CreateKafkaMessage } from "../connectors/kafka";
 
 //In this one
 @Middleware({ type: "before" })
@@ -17,7 +17,9 @@ export class AppBeforeMiddleware implements ExpressMiddlewareInterface {
   }
 
   use(request: any, response: any, next: (err?: any) => any) {
-    this.enbdProducer.sendMessage("log", this.msgString + "Before-Middleware");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgString + "Before-Middleware"])
+    );
     next();
   }
 }
@@ -32,7 +34,9 @@ export class AppAfterMiddleware implements ExpressMiddlewareInterface {
   }
 
   use(request: any, response: any, next: (err?: any) => any) {
-    this.enbdProducer.sendMessage("log", this.msgString + "After-Middleware");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgString + "After-Middleware"])
+    );
     next();
   }
 }
@@ -52,6 +56,10 @@ export class AppErrorMiddleware implements ExpressErrorMiddlewareInterface {
     response: any,
     next: (err?: any) => any
   ): void {
-    this.enbdProducer.sendMessage("log", this.msgString + "Error-Middleware");
+    this.enbdProducer.sendMessage(
+      CreateKafkaMessage("log", [this.msgString + "Error-Middleware"])
+    );
+
+    console.log("ZZZZZZZZ", error);
   }
 }

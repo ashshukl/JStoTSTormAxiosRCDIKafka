@@ -1,6 +1,6 @@
 import { ExpressMiddlewareInterface } from "routing-controllers";
 import Container, { Inject, Service } from "typedi";
-import { enbdProducer } from "../connectors/kafka";
+import { CreateKafkaMessage, enbdProducer } from "../connectors/kafka";
 
 //Since Middleware is also a service then in that case dependencies can be property injected in middleware using @Inject
 @Service()
@@ -10,8 +10,7 @@ export class ProductsBeforeMiddleware implements ExpressMiddlewareInterface {
 
   use(request: any, response: any, next: (err?: any) => any) {
     this.enbdProducer?.sendMessage(
-      "log",
-      "Logging from Products-Before-Middleware"
+      CreateKafkaMessage("log", ["Logging from Products-Before-Middleware"])
     );
     next();
   }
@@ -24,8 +23,7 @@ export class ProductsAfterMiddleware implements ExpressMiddlewareInterface {
 
   use(request: any, response: any, next: (err?: any) => any) {
     this.enbdProducer?.sendMessage(
-      "log",
-      "Logging from Products-After-Middleware"
+      CreateKafkaMessage("log", ["Logging from Products-After-Middleware"])
     );
     next();
   }
@@ -40,8 +38,9 @@ export class ProductsBeforeCreateMiddleware
 
   use(request: any, response: any, next: (err?: any) => any) {
     this.enbdProducer?.sendMessage(
-      "log",
-      "Logging from Products-BeforeCreate-Middleware"
+      CreateKafkaMessage("log", [
+        "Logging from Products-BeforeCreate-Middleware",
+      ])
     );
     next();
   }

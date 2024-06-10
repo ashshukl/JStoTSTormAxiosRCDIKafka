@@ -1,6 +1,6 @@
 import { Controller, Req, Res, Get } from "routing-controllers";
 import { Inject, Service } from "typedi";
-import { enbdProducer } from "../connectors/kafka";
+import { enbdProducer, CreateKafkaMessage } from "../connectors/kafka";
 
 @Controller("/")
 @Service()
@@ -12,7 +12,7 @@ export class HomeController {
 
   @Get()
   getHome() {
-    this.enbdProducer.sendMessage("log", this.msgStr);
+    this.enbdProducer.sendMessage(CreateKafkaMessage("log", [this.msgStr]));
     return "{Hurray, You have Reached HOME!!!}";
   }
 }
