@@ -36,33 +36,47 @@ export class CustomersController {
 
   @Get("/:id")
   async get(@Param("id") id: number) {
-    await this.enbdProducer.sendMessage(
-      CreateKafkaMessage("log", [this.logMsg + "getById"])
-    );
-    await this.enbdProducer.sendMessage(
-      CreateKafkaMessage("notify", [
-        "Customer Searched by Id",
-      ]) as ProducerRecord
-    );
+    // await this.enbdProducer.sendMessage(
+    //   CreateKafkaMessage("log", [this.logMsg + "getById"])
+    // );
+    // await this.enbdProducer.sendMessage(
+    //   CreateKafkaMessage("notify", [
+    //     "Customer Searched by Id",
+    //   ]) as ProducerRecord
+    // );
     return this.customersSvc?.get(id);
   }
 
   @Put("/:id")
   async update(@Param("id") id: number, @Body() customerJSON: any) {
-    let batch: TopicMessages[] = [];
+    // let batch: TopicMessages[] = [];
 
     let customer: Customer = plainToClass(Customer, customerJSON);
 
-    batch.push(
-      CreateKafkaMessage("log", [
-        this.logMsg + "update",
-        JSON.stringify(customerJSON),
-      ])
-    );
-    batch.push(CreateKafkaMessage("notify", ["Customer Modified"]));
+    // batch.push(
+    //   CreateKafkaMessage("log", [
+    //     this.logMsg + "update",
+    //     JSON.stringify(customerJSON),
+    //   ])
+    // );
+    // batch.push(CreateKafkaMessage("notify", ["Customer Modified"]));
 
-    await this.enbdProducer.sendMessageBatch(batch);
+    // await this.enbdProducer.sendMessageBatch(batch);
     return this.customersSvc?.update(id, customer);
+  }
+
+  @Post()
+  async create(@Body() customerJSON: any) {
+    let customer: Customer = plainToClass(Customer, customerJSON);
+    // let msgBatch: TopicMessages[] = [
+    //   CreateKafkaMessage("log", [
+    //     this.logMsg + "create",
+    //     JSON.stringify(customer),
+    //   ]),
+    //   CreateKafkaMessage("notify", ["Customer Created"]),
+    // ];
+    // await this.enbdProducer.sendMessageBatch(msgBatch);
+    return this.customersSvc?.create(customer);
   }
 
   @Delete("/:id")
@@ -84,19 +98,5 @@ export class CustomersController {
     ];
     await this.enbdProducer.sendXactionMessageBatch(msgBatch);
     return this.customersSvc?.getAll();
-  }
-
-  @Post()
-  async create(@Body() customerJSON: any) {
-    let customer: Customer = plainToClass(Customer, customerJSON);
-    let msgBatch: TopicMessages[] = [
-      CreateKafkaMessage("log", [
-        this.logMsg + "create",
-        JSON.stringify(customer),
-      ]),
-      CreateKafkaMessage("notify", ["Customer Created"]),
-    ];
-    await this.enbdProducer.sendMessageBatch(msgBatch);
-    return this.customersSvc?.create(customer);
   }
 }

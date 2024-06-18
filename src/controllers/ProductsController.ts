@@ -52,9 +52,9 @@ export class ProductsController {
 
   @Get()
   getAll() {
-    this.enbdProducer.sendMessage(
-      CreateKafkaMessage("log", [this.msgStr + "getAll"])
-    );
+    // this.enbdProducer.sendMessage(
+    //   CreateKafkaMessage("log", [this.msgStr + "getAll"])
+    // );
     return this.productSvc?.getAll();
   }
 

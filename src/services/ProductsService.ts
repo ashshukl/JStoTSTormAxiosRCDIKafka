@@ -1,5 +1,6 @@
 import { Inject, Service } from "typedi";
 import { CreateKafkaMessage, enbdProducer } from "../connectors/kafka";
+import { ProductHelper } from "../helpers/products.helper";
 
 @Service()
 export class ProductsService {
@@ -9,10 +10,10 @@ export class ProductsService {
   enbdProducer!: enbdProducer;
 
   getAll() {
-    this.enbdProducer.sendMessage(
-      CreateKafkaMessage("log", [this.msgStr + "getAll"])
-    );
-    return { output: "Test Data - getAll" };
+    // this.enbdProducer.sendMessage(
+    //   CreateKafkaMessage("log", [this.msgStr + "getAll"])
+    // );
+    return ProductHelper.getProducts();
   }
 
   getById(id: number) {

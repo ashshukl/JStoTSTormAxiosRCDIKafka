@@ -30,57 +30,57 @@ export class enbdProducer {
   }
 
   public async sendMessage(topicMessage: TopicMessages) {
-    // console.log("MESSAGE: " + JSON.stringify(message));
-    this.producer.connect().then(async () => {
-      await this.producer.send(topicMessage);
-      // await this.producer.disconnect();
-    });
+    // // console.log("MESSAGE: " + JSON.stringify(message));
+    // this.producer.connect().then(async () => {
+    //   await this.producer.send(topicMessage);
+    //   // await this.producer.disconnect();
+    // });
   }
 
   public async sendMessageBatch(topicMessages: TopicMessages[]) {
-    // console.log("MESSAGE BATCH: " + JSON.stringify(topicMessages));
-    this.producer.connect().then(async () => {
-      await this.producer.sendBatch({ topicMessages });
-      // console.log(topicMessages);
-      // await this.producer.disconnect();
-    });
+    // // console.log("MESSAGE BATCH: " + JSON.stringify(topicMessages));
+    // this.producer.connect().then(async () => {
+    //   await this.producer.sendBatch({ topicMessages });
+    //   // console.log(topicMessages);
+    //   // await this.producer.disconnect();
+    // });
   }
 
   public async sendXactionMessage(topicMessage: TopicMessages) {
-    // console.log("Transaction message: " + JSON.stringify(topicMessage));
-    this.xactionProducer.connect().then(async () => {
-      const transaction = await this.xactionProducer.transaction();
-      try {
-        await transaction.send(topicMessage);
-        await transaction.commit();
-      } catch (e) {
-        transaction.abort();
-      } finally {
-        // await this.xactionProducer.disconnect();
-      }
-    });
+    // // console.log("Transaction message: " + JSON.stringify(topicMessage));
+    // this.xactionProducer.connect().then(async () => {
+    //   const transaction = await this.xactionProducer.transaction();
+    //   try {
+    //     await transaction.send(topicMessage);
+    //     await transaction.commit();
+    //   } catch (e) {
+    //     transaction.abort();
+    //   } finally {
+    //     // await this.xactionProducer.disconnect();
+    //   }
+    // });
   }
 
   public async sendXactionMessageBatch(topicMessages: TopicMessages[]) {
-    console.log("Transaction message batch: " + topicMessages);
-    this.xactionProducer.connect().then(async () => {
-      const transaction = await this.xactionProducer.transaction();
-      try {
-        await transaction.sendBatch({ topicMessages });
-        await transaction.commit();
-      } catch (e) {
-        console.log("YYYYYYY", e);
-        transaction.abort();
-      } finally {
-        // await this.xactionProducer.disconnect();
-      }
-    });
+    // console.log("Transaction message batch: " + topicMessages);
+    // this.xactionProducer.connect().then(async () => {
+    //   const transaction = await this.xactionProducer.transaction();
+    //   try {
+    //     await transaction.sendBatch({ topicMessages });
+    //     await transaction.commit();
+    //   } catch (e) {
+    //     console.log("YYYYYYY", e);
+    //     transaction.abort();
+    //   } finally {
+    //     // await this.xactionProducer.disconnect();
+    //   }
+    // });
   }
 
   public async disconnect() {
-    await this.producer.disconnect();
-    await this.xactionProducer.disconnect();
-    console.log("Logging from enbdProducer - Disconnected");
+    // await this.producer.disconnect();
+    // await this.xactionProducer.disconnect();
+    // console.log("Logging from enbdProducer - Disconnected");
   }
 }
 
